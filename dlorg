@@ -1,3 +1,14 @@
-This dlorg file created from my local machine
+#!/usr/bin/env bash
 
+downloads="$HOME/Downloads"
 
+mkdir -p "$downloads/text"
+
+echo "dlorg started"
+echo "Monitoring $downloads"
+
+inotifywait -m -e close_write -e moved_to --format "%f" "$downloads" | while read -r filename; do case "$filename" in
+    *.txt) mv "$downloads/$filename" "$downloads/text/" ;;
+*) echo "$filename is another file format" ;;
+esac
+done
