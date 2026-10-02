@@ -1,14 +1,35 @@
 #!/usr/bin/env bash
 
+# Katalogen som dlorg övervakar och organiserar
 downloads="$HOME/Downloads"
 
-mkdir -p "$downloads/text"
+# organize_file är den som flyttar en fil till rätt katalog
+# Föreläsning 16_bash_functions
+organize_file() {
+   local filename="$1"
+   local directory="$2"
+
+   mkdir -p "$downloads/$directory"
+   mv "$downloads/$filename" "$downloads/$directory/"
+}
+
 
 echo "dlorg started"
 echo "Monitoring $downloads"
 
-inotifywait -m -e close_write -e moved_to --format "%f" "$downloads" | while read -r filename; do case "$filename" in
-    *.txt) mv "$downloads/$filename" "$downloads/text/" ;;
-*) echo "$filename is another file format" ;;
+# Övervakar Downloads efter nya eller färdignedladdade filer
+# Föreläsning 5_while_events och 12_bash_control_structures
+inotifywait -m -e close_write -e moved_to --format "%f" "$downloads" | while read -r filename; do
+
+# Filtyper sorteras med case enligt exemplet_ 5_case, föreläsning 12_bash_control_structures
+ case "$filename" in
+    *.txt) organize_file "$filename" "text" ;;
+    *.pdf) organize_file "$filename" "pdfs" ;;
+    *.png|*.jpg|*.jpeg) organize_file "$filename" "images" ;;
+    *.docx) organize_file "$filename" "docs" ;;
+    *.mp3|*.wav) organize_file "$filename" "audio" ;;
+    *.mp4|*.mov) organize_file "$filename" "videos" ;;
+    *.zip|*.tar|*.gz) organize_file "$filename" "archives" ;;
+    *) organize_file "$filename" "other" ;;       
 esac
 done
