@@ -1,0 +1,15 @@
+[Unit]
+Description="Automatically organize Downloads files"
+# Start after the default user target
+After=default.target
+
+[Service]
+# runs continuously to monitor Downloads
+Type=simple
+# %h -> home directory
+ExecStart=%h/.local/bin/dlorg
+Restart=on-failure
+
+[Install]
+# Enable automatic start with the user systemd session
+WantedBy=default.target
